@@ -56,7 +56,7 @@ const LoginForm = () => {
       if (logInData?.error) {
         console.log(logInData.error);
       } else {
-        router.push("/patients/[userId]/new-appointment");
+        router.push("/patients/[userId]");
       }
     } finally {
       setIsLoading(false);
@@ -130,15 +130,6 @@ const LoginForm = () => {
               )}
             />
 
-            <div className="flex items-center justify-between">
-              <button
-                type="button"
-                className="text-sm text-blue-600 hover:text-blue-500"
-              >
-                Forgot password?
-              </button>
-            </div>
-
             <Button
               type="submit"
               className="w-full bg-blue-700 hover:bg-blue-900"
@@ -166,9 +157,6 @@ const LoginForm = () => {
         </div>
         <div className="flex justify-between mt-8">
           <p className="text-zinc-500">© MediPoint</p>
-          <Link href="/admin" className="text-blue-800 font-bold">
-            Admin
-          </Link>
         </div>
       </CardContent>
     </Card>

@@ -50,6 +50,7 @@ const SignupForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
+    setLoading(true);
     const response = await fetch("/api/user", {
       method: "POST",
       headers: {
@@ -69,7 +70,7 @@ const SignupForm = () => {
         password: values.password,
       });
       if (signInResult?.ok) {
-        router.push("/patients/[userId]/new-appointment");
+        router.push("/patients/[userId]");
       } else {
         console.error("Sign in after signup failed");
       }
@@ -77,13 +78,21 @@ const SignupForm = () => {
       const errorData = await response.json();
       console.error("Failed to create account:", errorData.message);
     }
+    setLoading(false);
   };
   const { pending } = useFormStatus();
   return (
     <Card className="w-full max-w-md shadow-xl">
       <CardHeader className="space-y-1">
         <div className="flex justify-center">
-          <Image src="/logo.png" width={150} height={150} alt="logo" />
+          <Image
+            src="/logo.png"
+            width={150}
+            height={150}
+            alt="logo"
+            priority
+            style={{ height: "auto" }}
+          />
         </div>
         <CardTitle className="text-2xl font-bold text-zinc-700 text-center">
           Create Account

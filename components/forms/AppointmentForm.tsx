@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Calendar,
   Clock,
@@ -13,6 +14,11 @@ import {
   Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "@/components/forms/datepicker-custom.css";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -84,7 +90,12 @@ interface AppointmentFormProps {
   email: string;
 }
 
-const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, email }) => {
+const AppointmentForm: React.FC<AppointmentFormProps> = ({
+  firstName,
+  lastName,
+  email,
+}) => {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const departments = [
@@ -100,35 +111,39 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
 
   const doctorsByDepartment = {
     "General Medicine": [
-      "Dr. Sarah Johnson",
-      "Dr. Michael Chen",
-      "Dr. Emily Davis",
+      "Dr. Chidi Okafor",
+      "Dr. Amina Yusuf",
+      "Dr. Emeka Eze",
     ],
-    Cardiology: [
-      "Dr. Robert Wilson",
-      "Dr. Lisa Thompson",
-      "Dr. David Martinez",
+    Cardiology: ["Dr. Tunde Balogun", "Dr. Grace Nwosu", "Dr. Femi Adeyemi"],
+    Pediatrics: ["Dr. Ngozi Umeh", "Dr. Kelechi Obi", "Dr. Zainab Bello"],
+    Dermatology: [
+      "Dr. Uduak Essien",
+      "Dr. Ifeoma Okonkwo",
+      "Dr. Chuka Onwudiwe",
     ],
-    Pediatrics: ["Dr. Jennifer Lee", "Dr. Mark Anderson", "Dr. Rachel Green"],
-    Dermatology: ["Dr. Kevin Brown", "Dr. Amanda White", "Dr. Steven Taylor"],
     Orthopedics: [
-      "Dr. Thomas Miller",
-      "Dr. Jessica Garcia",
-      "Dr. Christopher Moore",
+      "Dr. Yakubu Suleiman",
+      "Dr. Nneka Iroha",
+      "Dr. Olumide Alabi",
     ],
-    Neurology: [
-      "Dr. Patricia Jackson",
-      "Dr. James Rodriguez",
-      "Dr. Michelle Lewis",
+    Neurology: ["Dr. Abdullahi Musa", "Dr. Yetunde Ojo", "Dr. Bamidele Ajayi"],
+    Psychiatry: [
+      "Dr. Funmi Adebayo",
+      "Dr. Segun Ogunleye",
+      "Dr. Halima Danjuma",
     ],
-    Psychiatry: ["Dr. Daniel Harris", "Dr. Laura Clark", "Dr. Anthony Walker"],
-    Gynecology: ["Dr. Nancy Hall", "Dr. Karen Allen", "Dr. Elizabeth Young"],
+    Gynecology: [
+      "Dr. Chinyere Ugochukwu",
+      "Dr. Aishat Ibrahim",
+      "Dr. Vivian Nwachukwu",
+    ],
   };
 
   const form = useForm({
     resolver: zodResolver(AppointmentSchema),
     defaultValues: {
-      fullName: firstName,
+      fullName: firstName + " " + lastName,
       email: email,
       phoneNumber: "",
       gender: "",
@@ -162,6 +177,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
       alert(
         "Appointment booked successfully! You will receive a confirmation email shortly."
       );
+      const queryParams = new URLSearchParams({
+        doctor: data.doctor,
+        preferredDate: data.preferredDate,
+        preferredTime: data.preferredTime,
+      }).toString();
+      router.push(`/patients/success?${queryParams}`);
       form.reset();
     } catch (error) {
       console.error("Appointment booking error:", error);
@@ -184,6 +205,13 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-12 px-4">
       <div className="max-w-6xl xl:px-6 px-8 mx-auto">
+        <Button
+          variant="outline"
+          className="mb-6"
+          onClick={() => router.push("/Auth/Login")}
+        >
+          Back to Login
+        </Button>
         <Image
           src="/logo.png"
           width={160}
@@ -192,8 +220,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
           className="mb-8"
         />
         <div className=" mb-12">
-          <h1 className="text-4xl font-bold text-zinc-9=700 mb-4">
-            Hey, {firstName}
+          <h1 className="text-4xl font-bold text-zinc-700 mb-4">
+            Hey, {firstName}👋
           </h1>
           <p className="sm:text-xl text-gray-600 mx-auto">
             Schedule your appointments with our medical professionals quickly
@@ -203,13 +231,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
         <div className="">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="">
-              {/* Personal Information Section */}
               <div className="mb-12">
                 <div className="flex items-center gap-3 mb-8">
                   <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
                     <User className="w-5 h-5 text-blue-600" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-gray-900">
+                  <h2 className="text-2xl font-semibold text-gray-700">
                     Personal Information
                   </h2>
                 </div>
@@ -272,12 +299,16 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
                             Phone Number *
                           </FormLabel>
                           <FormControl>
-                            <Input
+                            <PhoneInput
                               {...field}
-                              type="tel"
+                              international
+                              defaultCountry="US"
+                              countryCallingCodeEditable={false}
                               placeholder="Enter phone number"
-                              className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                              className="w-full h-12 border border- rounded-md px-3 focus:border-blue-500 focus:ring-blue-500"
                               disabled={loading}
+                              value={field.value}
+                              onChange={field.onChange}
                             />
                           </FormControl>
                           <FormMessage />
@@ -327,11 +358,22 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
                             Date of Birth *
                           </FormLabel>
                           <FormControl>
-                            <Input
-                              {...field}
-                              type="date"
-                              className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                            <DatePicker
+                              selected={
+                                field.value ? new Date(field.value) : null
+                              }
+                              onChange={(date) =>
+                                field.onChange(
+                                  date ? date.toISOString().split("T")[0] : ""
+                                )
+                              }
+                              dateFormat="yyyy-MM-dd"
+                              placeholderText="Select date of birth"
+                              className="h-12 w-full border border-gray-300 rounded-md px-3 focus:border-blue-500 focus:ring-blue-500"
                               disabled={loading}
+                              maxDate={new Date()}
+                              showYearDropdown
+                              scrollableYearDropdown
                             />
                           </FormControl>
                           <FormMessage />
@@ -342,13 +384,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
                 </div>
               </div>
 
-              {/* Appointment Type Section */}
               <div className="mb-12">
                 <div className="flex items-center gap-3 mb-8">
                   <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
                     <Calendar className="w-5 h-5 text-green-600" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-gray-900">
+                  <h2 className="text-2xl font-semibold text-gray-700">
                     Appointment Type
                   </h2>
                 </div>
@@ -393,13 +434,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
                 />
               </div>
 
-              {/* Medical Details Section */}
               <div className="mb-12">
                 <div className="flex items-center gap-3 mb-8">
                   <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg">
                     <Stethoscope className="w-5 h-5 text-purple-600" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-gray-900">
+                  <h2 className="text-2xl font-semibold text-gray-700">
                     Medical Details
                   </h2>
                 </div>
@@ -487,19 +527,30 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
                           Preferred Date *
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            {...field}
-                            type="date"
-                            min={new Date().toISOString().split("T")[0]}
-                            className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                            disabled={loading}
-                          />
+                          <FormControl>
+                            <DatePicker
+                              selected={
+                                field.value ? new Date(field.value) : null
+                              }
+                              onChange={(date) =>
+                                field.onChange(
+                                  date ? date.toISOString().split("T")[0] : ""
+                                )
+                              }
+                              dateFormat="yyyy-MM-dd"
+                              placeholderText="Select your preferred date"
+                              className="h-12 w-full border border-gray-300 rounded-md px-3 focus:border-blue-500 focus:ring-blue-500"
+                              disabled={loading}
+                              minDate={new Date()}
+                              showYearDropdown
+                              scrollableYearDropdown
+                            />
+                          </FormControl>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
                   <FormField
                     control={form.control}
                     name="preferredTime"
@@ -510,9 +561,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
                         </FormLabel>
                         <FormControl>
                           <Input
-                            {...field}
                             type="time"
-                            className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                            value={field.value}
+                            onChange={field.onChange}
+                            className="h-12 w-full border border-gray-300 rounded-md px-3 focus:border-blue-500 focus:ring-blue-500"
                             disabled={loading}
                           />
                         </FormControl>
@@ -545,14 +597,13 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
                 />
               </div>
 
-              {/* Video Consultation Section */}
               {appointmentType === "video" && (
                 <div className="mb-12">
                   <div className="flex items-center gap-3 mb-8">
                     <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
                       <Video className="w-5 h-5 text-blue-600" />
                     </div>
-                    <h2 className="text-2xl font-semibold text-gray-900">
+                    <h2 className="text-2xl font-semibold text-gray-700">
                       Video Consultation Setup
                     </h2>
                   </div>
@@ -624,7 +675,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ firstName, lastName, 
                 </div>
               )}
 
-              {/* Terms and Submit Section */}
               <div className="border-t border-gray-200 pt-8">
                 <div className="space-y-6">
                   <FormField

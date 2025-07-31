@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MediPoint
+
+MediPoint is a modern healthcare appointment platform designed to streamline the process of booking and managing medical appointments. The application features a clean, user-friendly interface and leverages a robust technology stack to deliver a seamless experience for both patients and healthcare providers.
+
+## Features
+
+- **Appointment Booking:** Patients can easily request and manage appointments with their preferred doctors and departments.
+- **Responsive UI:** Clean, accessible, and responsive design for all devices.
+- **Confirmation & Feedback:** Users receive instant feedback and confirmation upon submitting appointment requests.
+- **User Authentication:** Secure login and registration flows.
+- **Form Validation:** Robust client-side validation for all forms.
+
+## Technologies Used
+
+- **Next.js** – React framework for server-side rendering and routing.
+- **React** – Component-based UI development.
+- **TypeScript** – Type safety for scalable and maintainable code.
+- **Prisma** – Modern ORM for database access.
+- **Zod** – Schema validation for forms and API routes.
+- **React Hook Form** – Performant and flexible form management.
+- **Lucide React** – Icon library for consistent, modern icons.
+- **Tailwind CSS** – Utility-first CSS framework for rapid UI development.
+- **NextAuth.js** – Authentication for Next.js applications.
+
+## UI/UX Design
+
+- **Minimalist & Clean:** The interface uses whitespace, clear typography, and a consistent color palette for a professional look.
+- **Accessible:** All components are designed with accessibility in mind.
+- **Feedback-Oriented:** Users receive clear feedback on actions, such as appointment submissions and errors.
 
 ## Getting Started
 
-First, run the development server:
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/noeljr2306/medipoint-system.git
+   cd medipoint
+   ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+2. **Install dependencies:**
+   ```sh
+   npm install
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. **Set up environment variables:**
+   - Copy  `.env` and fill in the required values.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+4. **Run the development server:**
+   ```sh
+   npm run dev
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+5. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
 
-## Learn More
+## Folder Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `app/` – Next.js app directory (pages, layouts, API routes)
+- `components/` – Reusable UI components and forms
+- `lib/` – Utility functions and helpers
+- `prisma/` – Prisma schema and migrations
+- `public/` – Static assets (images, icons)
+- `schema/` – Zod schemas for validation
+- `types/` – TypeScript type definitions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Screenshots
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+![Appointment Success Page](public/preview.png)
+*Clean, modern confirmation page after booking an appointment.*
