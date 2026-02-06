@@ -3,9 +3,10 @@ import { db } from "@/lib/db";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
+    const { id } = context.params;
     const { status } = await request.json();
 
     if (!status || !["approved", "rejected", "pending"].includes(status)) {
@@ -16,9 +17,17 @@ export async function PATCH(
     }
 
     const updatedAppointment = await db.appointment.update({
-      where: { id: parseInt(params.id) },
+      where: { id: Number(id) },
       data: { status },
-      include: { user: { select: { firstName: true, lastName: true, email: true } } },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+      },
     });
 
     return NextResponse.json({ appointment: updatedAppointment });
