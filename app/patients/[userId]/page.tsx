@@ -11,13 +11,9 @@ type UserWithFirstName = {
 
 const page = async () => {
   const session = await getServerSession(authOptions);
-  console.log("Session:", session);
   const firstName = session?.user.firstName ?? "user";
   const lastName = session?.user.lastName ?? "";
   const email = session?.user.email ?? "";
-  console.log("FirstName:", firstName);
-  console.log("LastName:", lastName);
-  console.log("Email:", email);
   return <AppointmentForm firstName={firstName} lastName={lastName} email={email} />;
 
 }

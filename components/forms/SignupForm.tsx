@@ -22,19 +22,18 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
-import { useFormStatus } from "react-dom";
-
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { RegisterSchema } from "@/schema";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 
 const SignupForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
 
@@ -51,36 +50,55 @@ const SignupForm = () => {
 
   const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
     setLoading(true);
-    const response = await fetch("/api/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        firstName: values.firstName,
-        lastName: values.lastName,
-        email: values.email,
-        password: values.password,
-      }),
-    });
-    if (response.ok) {
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("/api/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          password: values.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Failed to create account");
+        return;
+      }
+
+      // ✅ Sign in immediately after signup
       const signInResult = await signIn("credentials", {
         redirect: false,
         email: values.email,
         password: values.password,
       });
+
       if (signInResult?.ok) {
-        router.push("/patients/[userId]");
+        // ✅ Get the session to retrieve the user ID
+        const session = await getSession();
+        const userId = session?.user?.id;
+
+        if (userId) {
+          router.push(`/patients/${userId}`);
+        } else {
+          router.push("/patients"); // fallback if id missing
+        }
       } else {
-        console.error("Sign in after signup failed");
+        setErrorMessage("Sign in after signup failed");
       }
-    } else {
-      const errorData = await response.json();
-      console.error("Failed to create account:", errorData.message);
+    } catch (err) {
+      setErrorMessage("Something went wrong");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
-  const { pending } = useFormStatus();
+
   return (
     <Card className="w-full max-w-md shadow-xl">
       <CardHeader className="space-y-1">
@@ -105,6 +123,7 @@ const SignupForm = () => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
+              {/* First Name */}
               <FormField
                 control={form.control}
                 name="firstName"
@@ -127,7 +146,7 @@ const SignupForm = () => {
                   </FormItem>
                 )}
               />
-
+              {/* Last Name */}
               <FormField
                 control={form.control}
                 name="lastName"
@@ -152,6 +171,7 @@ const SignupForm = () => {
               />
             </div>
 
+            {/* Email */}
             <FormField
               control={form.control}
               name="email"
@@ -175,6 +195,7 @@ const SignupForm = () => {
               )}
             />
 
+            {/* Password */}
             <FormField
               control={form.control}
               name="password"
@@ -206,6 +227,7 @@ const SignupForm = () => {
               )}
             />
 
+            {/* Confirm Password */}
             <FormField
               control={form.control}
               name="confirmPassword"
@@ -239,10 +261,11 @@ const SignupForm = () => {
               )}
             />
 
+            {/* Submit */}
             <Button
               type="submit"
               className="w-full bg-blue-700 hover:bg-blue-900"
-              disabled={pending}
+              disabled={loading}
             >
               {loading ? (
                 <div className="flex items-center space-x-2">

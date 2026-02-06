@@ -18,7 +18,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,7 +28,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
@@ -53,10 +52,19 @@ const LoginForm = () => {
         password: values.password,
         redirect: false,
       });
+
       if (logInData?.error) {
         console.log(logInData.error);
       } else {
-        router.push("/patients/[userId]");
+        // ✅ Get the session to retrieve the user ID
+        const session = await getSession();
+        const userId = session?.user?.id;
+
+        if (userId) {
+          router.push(`/patients/${userId}`);
+        } else {
+          router.push("/patients"); // fallback if id missing
+        }
       }
     } finally {
       setIsLoading(false);
@@ -157,6 +165,9 @@ const LoginForm = () => {
         </div>
         <div className="flex justify-between mt-8">
           <p className="text-zinc-500">© MediPoint</p>
+          <Link href="/admin/login" className="text-blue-900 font-bold text-sm">
+            Admin Access
+          </Link>
         </div>
       </CardContent>
     </Card>

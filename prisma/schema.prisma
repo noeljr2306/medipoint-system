@@ -10,16 +10,40 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
+
+
 model User {
   id    Int     @id @default(autoincrement())
   email String  @unique
   firstName String
   lastName String
   password String
+  role  String  @default("patient")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  appointments Appointment[]
+}
+
+model Appointment {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName      String
+  email         String
+  phoneNumber   String
+  gender        String
+  dateOfBirth   String
+  appointmentType String
+  department    String
+  doctor        String
+  preferredDate String
+  preferredTime String
+  reasonForVisit String
+  videoPlatform String?
+  status        String   @default("pending") // pending, approved, rejected
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
