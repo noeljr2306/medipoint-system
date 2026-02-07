@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { hash } from "bcrypt";
 import * as z from "zod";
 
+export const dynamic = 'force-dynamic';
+
 const userSchema = z.object({
   firstName: z.string().min(1, {
     message: "Please enter your first name",
