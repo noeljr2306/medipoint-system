@@ -1,11 +1,13 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Calendar, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Suspense } from "react"; 
 
-const RequestSuccess = () => {
+const RequestSuccessContent = () => {
   const searchParams = useSearchParams();
   const doctor = searchParams.get("doctor") || "N/A";
   const preferredDate = searchParams.get("preferredDate") || "N/A";
@@ -40,15 +42,19 @@ const RequestSuccess = () => {
           </div>
           <div className="flex gap-2">
             <Calendar />
-            <p>{preferredDate} - {preferredTime}</p>
+            <p>
+              {preferredDate} - {preferredTime}
+            </p>
           </div>
         </section>
+
         <Button
           variant="outline"
           className="mt-6 bg-blue-600 text-white"
           asChild
         >
-          <Link href={`/patients/$[userId]`}>New Appointment</Link>
+          {/* Fixed the template literal syntax here as well */}
+          <Link href="/patients/dashboard">New Appointment</Link>
         </Button>
 
         <p className="text-xs text-gray-400 mt-10">© 2025 MediPoint</p>
@@ -57,4 +63,13 @@ const RequestSuccess = () => {
   );
 };
 
-export default RequestSuccess;
+// 3. Export the component wrapped in Suspense
+export default function RequestSuccess() {
+  return (
+    <Suspense
+      fallback={<div className="flex-center h-screen w-full">Loading...</div>}
+    >
+      <RequestSuccessContent />
+    </Suspense>
+  );
+}
