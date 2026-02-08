@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { hash } from "bcrypt";
 import * as z from "zod";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 const userSchema = z.object({
   firstName: z.string().min(1, {
@@ -32,7 +32,7 @@ export async function GET() {
   } catch (error) {
     return NextResponse.json(
       { users: [], message: "Failed to fetch users" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -42,49 +42,44 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, firstName, lastName, password } = userSchema.parse(body);
 
-    const existingUserByEmail = await db.user.findUnique({
-      where: { email: email },
+    const existingUser = await db.user.findUnique({
+      where: { email },
     });
-    if (existingUserByEmail) {
-      return NextResponse.json(
-        { user: null, message: "Email already exists" },
-        { status: 409 }
-      );
-    }
-    const existingUser = await db.user.findFirst({
-      where: {
-        firstName: firstName,
-        lastName: lastName,
-      },
-    });
+
     if (existingUser) {
       return NextResponse.json(
-        { user: null, message: "This name combination already exists" },
-        { status: 409 }
+        { message: "Email already exists" },
+        { status: 409 },
       );
     }
 
     const hashedPassword = await hash(password, 10);
-    const newUser = await db.user.create({
+
+    const user = await db.user.create({
       data: {
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
+        email,
+        firstName,
+        lastName,
         password: hashedPassword,
+        role: "patient",
       },
     });
 
-    const { password: newUserPassword, ...rest } = newUser;
+    const { password: _, ...safeUser } = user;
 
     return NextResponse.json(
-      { user: rest, message: "User created successfully" },
-      { status: 201 }
+      { user: safeUser, message: "User created successfully" },
+      { status: 201 },
     );
   } catch (error) {
-    console.error("User creation error:", error);
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ message: error.issues }, { status: 400 });
+    }
+
+    console.error("Signup error:", error);
     return NextResponse.json(
-      { user: null, message: "User creation failed" },
-      { status: 500 }
+      { message: "User creation failed" },
+      { status: 500 },
     );
   }
 }
